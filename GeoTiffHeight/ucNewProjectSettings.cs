@@ -9,6 +9,7 @@ namespace GeoTiffHeight
         internal String GeoTiffFilename;
         internal Int32 AdjustE;
         internal Int32 AdjustN;
+        internal Int32 UTMZone;
         public ucNewProjectSettings()
         {
             InitializeComponent();
@@ -19,12 +20,15 @@ namespace GeoTiffHeight
                 GeoTiffHeight.Config.TryGet<String>("GeoTiffFileName", out String tmpFileName);
                 GeoTiffHeight.Config.TryGet<Int32>("AdjustE", out Int32 tmpAdjustE);
                 GeoTiffHeight.Config.TryGet<Int32>("AdjustN", out Int32 tmpAdjustN);
+                GeoTiffHeight.Config.TryGet<Int32>("UTMZone", out Int32 tmpUTMZone);
                 geoTiffFilename.Text = tmpFileName;
                 GeoTiffFilename = tmpFileName;
                 AdjustE = tmpAdjustE;
                 AdjustN = tmpAdjustN;
+                UTMZone = tmpUTMZone;
                 adjustETextBox.Text = tmpAdjustE.ToString();
                 adjustNTextBox.Text = tmpAdjustN.ToString();
+                textBox1.Text = tmpUTMZone.ToString();
                 loadFile();
             }
             catch (Exception ex)
@@ -66,7 +70,7 @@ namespace GeoTiffHeight
                 double centerW = (geoTiff.StartW + rangeW);
                 double centerH = (geoTiff.StartH + rangeH);
                 LatLngUTMConverter converter = new LatLngUTMConverter("EUREF89");
-                LatLngUTMConverter.LatLng center = converter.convertUtmToLatLng((geoTiff.StartW + rangeW), (geoTiff.StartH + rangeH), 33, "N");
+                LatLngUTMConverter.LatLng center = converter.convertUtmToLatLng((geoTiff.StartW + rangeW), (geoTiff.StartH + rangeH), Int32.Parse(textBox1.Text) , "N");
 
                 geoTiffCenterLabel.Text = "E: " + centerW.ToString() + " m N: " + centerH.ToString() + " m" + " ( " + center.Lat.ToString() + ", " + center.Lng.ToString() + " )";
                 centerHeightLabel.Text = geoTiff.HeightMap[(int)(geoTiff.NWidth / 2.0) , (int)(geoTiff.NHeight / 2.0)].ToString() + " m";
@@ -96,6 +100,18 @@ namespace GeoTiffHeight
             try
             {
                 AdjustN = Int32.Parse(adjustNTextBox.Text);
+            }
+            catch(Exception ex)
+            {
+                ex.ToString();
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UTMZone = Int32.Parse(textBox1.Text);
             }
             catch(Exception ex)
             {
